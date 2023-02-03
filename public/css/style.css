@@ -1,0 +1,201 @@
+/* login.php */
+/* logo */
+.hp-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.hp-title .logo{
+    width: 140px;
+    height: 140px;
+}
+.hp-title h2{
+    font-size: 2rem;
+}
+/* login */
+.login-form div{
+    margin-bottom: 10px;
+}
+/* signup.php */
+.signup-form div{
+    margin-bottom: 24px;
+}
+.signup-form .submit{
+    margin-top: 24px;
+}
+/* signup-confirm.php */
+.confirm-content {
+    font-size: 1.2rem;
+    padding-left: 24px;
+}
+/* pass */
+.pass-form div{
+    margin-bottom: 24px;
+}
+
+/* home */
+.home-main {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.home-box-area {
+    width: 70%;
+    height: 86vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.home-box {
+    width: 100%;
+    height: 100%;
+}
+.home-box-row {
+    height: calc(100% / 2 - 4vh);
+}
+/* end home */
+
+/* category-kinds */
+.category-kinds-summary {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 24px;
+}
+
+/* expenditure */
+.main_category_form {
+    position: relative;
+}
+.main_category_btn {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0) ;
+    border: none;
+}
+.main_category_btn:hover {
+    cursor: pointer;
+}
+.main_category_btn:focus {
+    outline: none;
+}
+/* add */
+.add-btn-form {
+    width: calc(100% / 2 - 36px);
+    position: relative;
+    border-radius: 24px;
+}
+.add-btn-submit {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0) ;
+    border: none;
+}
+.add-btn-submit:hover {
+    cursor: pointer;
+}
+.add-btn-submit:focus {
+    outline: none;
+}
+.add_category_area {
+    width: 76%;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    font-size: 1.4rem;
+    color: var(--input-text-color);
+}
+
+/* ex-add-confirm */
+.add_confirm{
+    padding: 0 6%;
+    text-align: center;
+}
+.add_data, .data_one {
+    font-size: 1.4rem;
+    color: var(--input-text-color);
+}
+.add_data_textarea {
+    width: 100%;
+    margin: 24px 0 0;
+    padding: 2%;
+    font-size: 1.1rem;
+    border-radius: 10px;
+    border: none;
+    resize: none;
+    background-color: hsl(0, 0%, 95%);
+    color: var(--input-text-color);
+}
+.submit.back-btn{
+    border: 2px solid var(--accent-color);
+    color: var(--accent-color);
+    background-color: transparent;
+}
+
+.back-btn.add-comp {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0;
+}
+
+/* user-list */
+.user-id {
+    width: 24px;
+}
+.user-name {
+    width: 90px;
+}
+
+/* account */
+.ac_logout { 
+    width: 100%;
+    display: block;
+    padding: 10px 10px;
+    border-radius: 8px;
+    font-size: 1.2em;
+}
+.ac-info { 
+    display: flex;
+}
+.ac-info h3{ 
+    min-width: 128px;
+}
+.ac-info p{ 
+    min-width: 100px;
+}
+.ac-info p::before{ 
+    content: " : ";
+}
+
+/* 所持金 */
+.po-kind {
+    align-items: center;
+    margin-right: 12px;
+}
+
+/* カテゴリー編集 */
+.box.categories{
+    align-items: normal;
+    padding: 3% 4%;
+}
+.by-category-title.categories{
+    height: 3vh;
+    font-size: 1.7rem;
+}
+.categories .summary {
+    text-align: center;
+    margin-top: 12px;
+}
+
+/* add-cate */
+.add-cate-btn{
+    display: block;
+    width: calc(100% / 2 - 36px);
+    position: relative;
+}

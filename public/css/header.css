@@ -1,0 +1,103 @@
+/* header */
+header {
+    width: 20%;
+    min-width: 165px;
+    height: 100vh;
+    background-color: var(--header-bg-color);
+    opacity: .8;
+    position: fixed;
+    overflow: scroll;
+    box-shadow: -20px 0px 20px rgba(0, 0, 0, 0.4);
+}
+.top, .bottom-menu {
+    display: none;
+}
+/* ロゴ */
+.h-logo{
+    height: 20vw;
+    min-height: 200px;
+    text-align: center;
+    color: var(--text-color);
+    opacity: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.h-logo h2{
+    font-size: 1.4rem;
+    text-align: center;
+    font-family: Hiragino Maru Gothic ProN W4、"ヒラギノ丸ゴ ProN W4";
+}
+.h-logo .icon{
+    font-size: 2rem;
+}
+.logo {
+    width: 100px;
+    height: 100px;
+    color: #a17b36;
+}
+.logo img{
+    width: 100%;
+    height: 100%;
+}
+/* ナビ、リンク、アイコン */
+.header-items {
+    min-width: 165px;
+    margin: 0 auto;
+    text-align: center;
+}
+nav ul {
+    width: 120px;
+    margin: 0 auto;
+}
+nav li {
+    margin-bottom: 24px;
+}
+li a {
+    font-size: 1.2rem;
+    color: var(--text-color);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.header-icon {
+    width: 40px;
+}
+.h-item-name{
+    width: 78px;
+    text-align: center;
+}
+/* 編集用リンク集 */
+.links-area {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+.links-back{
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, .2);
+}
+.links {
+    width: 300px;
+    height: 500px;
+    padding: 24px;
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    border-radius: 10px;
+    overflow: scroll;
+    background-color: #fff;
+    box-shadow: 0 10px 25px 0 rgba(0, 0, 0, .5);
+}
+.active {display: block;}
+
+.menu {
+    margin-top: 24px;
+}
