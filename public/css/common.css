@@ -110,6 +110,25 @@
     outline: none;
 }
 
+.back {
+    width: 48px;
+    height: 48px;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate(50%, -50%); 
+    text-align: center;
+}
+.back button {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background-color: transparent;
+    color: var(--text-color);
+    font-size: 2rem;
+    cursor: pointer;
+}
+
 /* form */
 .form-area {
     width: 80%;
@@ -270,6 +289,8 @@
     justify-content: center;
     align-items: center;
     font-size: 2rem;
+
+    position: relative;
 }
 .by-category-title .icon-area {
     margin-right: 1%;

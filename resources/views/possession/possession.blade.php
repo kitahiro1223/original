@@ -4,6 +4,11 @@
 <div class="container">
 <main class="by-category-main">
     <div class="by-category-title">
+        <div class="back">
+            <a href="home">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </div>
         <div class="icon-area color3"><!-- アイコンを収める -->
             <i class="icon fa-solid fa-piggy-bank"></i>
         </div>
@@ -11,10 +16,11 @@
     </div>
     <div class="box total-box">
         <h3>総計</h3>
-        <p>{{ "¥".number_format(array_sum(array_column($po_by_cates, 'sum'))) }}</p>
+        <p>{{ "¥".number_format($possessions_sum) }}</p>
     </div>
     <div class="by-category-inner">
         <div class="box-list">
+            @if(!empty($po_by_cates))
             <?php foreach ($po_by_cates as $po_by_cate): ?>
             <div>
                 <form action="po-category" method="POST" class="box box-link by-category-box main_category_form">
@@ -34,7 +40,8 @@
                 </form>
             </div>
             <?php endforeach; ?>
-            <a href="">
+            @endif
+            <a href="category-kinds">
                 <div class="box box-link by-category-box">
                     <div class="box-icon-area box-2-items"><!-- アイコンを動かす -->
                         <div class="icon-area color2"><!-- アイコンを収める -->

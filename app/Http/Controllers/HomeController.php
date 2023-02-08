@@ -30,21 +30,28 @@ class HomeController extends Controller
             'main_cates',
             'sub_cates',
             'sub_cate',
-            'to_sub',
             'main',
+            
             'ex_sources',
-            'in_to',
             'in_tos',
+            
+            'po_cates',
+            'in_cates',
+            'ex_cates',
+            
+            'data',
+            'kind',
             'add_data',
             'add_main_categories',
             'add_sub_categories',
-            'data',
             'edit_data',
-            'po_cates',
-            'po_by_cates',
-            'cate_results',
-            'kind',
-            'error'
+            'error',
+            
+            'add_cate'
+            // 'po_by_cates',
+            // 'in_to',
+            // 'to_sub',
+            // 'cate_results'
         ]);
 
         $user_id = $request->session()->get('login_web_59ba36addc2b2f9401580f014c7f58ea4e30989d');

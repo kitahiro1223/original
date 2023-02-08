@@ -3,7 +3,9 @@
 <div class="contents">
 <div class="container">
 <main class="data-individual">
-    <div class="form-area login-form">
+    <div class="by-category-title" style="margin:0 10%;">
+    </div>        
+    <div class="form-area login-form" style="margin: 0 auto;">
         <h2>編集の確認</h2>
         <form action="ex-edit" method="post">
             @csrf
@@ -32,10 +34,6 @@
                 <li>
                     <label for="ex_source" title="支出元"><i class="fa-solid fa-wallet"></i></label>
                     <div class="add_data">{{ $edit_data['ex_source'] }}</div>
-                </li>
-                <li>
-                    <label for="notion" title="通知"><i class="fa-solid fa-bell"></i></label>
-                    <div class="add_data">{{ $edit_data['notice'] }}</div>
                 </li>
                 <li>
                     <label for="name"><i class="fa-solid fa-tag" title="カテゴリー"></i></label>

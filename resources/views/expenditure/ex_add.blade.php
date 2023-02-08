@@ -2,8 +2,15 @@
 @section('content')
 <div class="contents">
 <div class="container">
-<main class="data-individual content-center" style="height: auto;">
-    <div class="form-area login-form">
+<main class="data-individual" style="height: auto;">
+    <div class="by-category-title" style="margin: 0 10%;">
+        <div class="back">
+            <a href="ex-by-category">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </div>
+    </div>
+    <div class="form-area login-form" style="margin: 0 auto;">
         <h2>支出の追加</h2>
         <form action="ex-add" method="post">
             @csrf
@@ -79,14 +86,7 @@
                 <li>
                     <label for="name"><i class="fa-solid fa-tag" title="名前"></i></label>
                     <input type="text" name="name" id="name" placeholder="名前" style="border-bottom: 1px solid var(--accent-color);" value="<?php if (!empty($add_data['name'])) { echo $add_data['name']; } ?>">
-                </li>           
-                <li>
-                    <label for="notion" title="通知"><i class="fa-solid fa-bell"></i></label>
-                    <div class="radio">
-                        <label><input type="radio" name="radio" value="1">ON</label>
-                        <label><input type="radio" name="radio" value="0" checked>OFF</label>
-                    </div>
-                </li>
+                </li>       
                 <textarea name="comment" rows="3" placeholder="メモ"><?php if (!empty($add_data['comment'])) { echo $add_data['comment']; } else { echo ""; } ?></textarea>
             </ul>
             <div><input type="submit" class="submit" name="add_submit" value="確認"></div>

@@ -2,30 +2,22 @@
 @section('content')
 <div class="contents content-center">
 <div class="container">
-<main>
+<main class="by-category-main">
     <div class="by-category-title" style="margin: 0 10%; height: 0;">
-        @if($data['kind_id'] == 2)
         <div class="back">
-            <a href="in-category">
+            <a href="expenditure">
                 <i class="fa-solid fa-chevron-left"></i>
             </a>
-        </div>                
-        @elseif($data['kind_id'] == 1)
-        <div class="back">
-            <a href="po-category">
-                <i class="fa-solid fa-chevron-left"></i>
-            </a>
-        </div>        
-        @endif        
-    </div>    
+        </div>
+    </div>
     <div class="form-area signup-form">
-        <h2>編集の完了</h2>
+        <h2>サブカテゴリーがありません</h2>
         <form action="" method="post">
             <div class="form-summary">
-                <p>収入の編集が完了しました。</p>
+                <p>設定の「カテゴリー編集」から サブカテゴリーを追加して下さい。</p>
             </div>
             <div class="back-btn add-comp">
-                <div><a href="income">収入画面へ戻る</a></div>
+                <div><a href="category-kinds">カテゴリー編集</a></div>
                 <div><a href="/">HOMEへ</a></div>
             </div>
         </form>    

@@ -2,8 +2,23 @@
 @section('content')
 <div class="contents">
 <div class="container">
-<main class="data-individual content-center" style="height: auto;">
-    <div class="form-area login-form">
+<main class="data-individual" style="height: auto;">
+    <div class="by-category-title" style="margin: 0 10%;">
+        @if($data['kind_id'] == 3 || empty($data['kind_id']))
+        <div class="back">
+            <a href="ex-by-category">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </div>                
+        @elseif($data['kind_id'] == 1)
+        <div class="back">
+            <a href="po-category">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </div>        
+        @endif
+    </div>
+    <div class="form-area login-form" style="margin: 0 auto;">
         <h2>編集</h2>
         <form action="ex-edit" method="post">
             @csrf
@@ -61,7 +76,11 @@
                     <label for="ex_source" title="支出元"><i class="fa-solid fa-wallet"></i></label>
                     <select name="ex_source" id="ex-source">
                         @if (!empty($edit_data['ex_source']))
-                            <option value="{{ $edit_data['ex_source'] }}">{{ $edit_data["ex_source"] }}</option>;
+                            @foreach ($ex_sources as $ex_source)
+                                @if ($edit_data['ex_source'] == $ex_source['id'])
+                                    <option value="{{ $ex_source['name'] }}">{{ $ex_source["name"] }}</option>
+                                @endif
+                            @endforeach
                         @else
                             <option value="">支出元を選択</option>
                         @endif
@@ -79,13 +98,6 @@
                 <li>
                     <label for="name"><i class="fa-solid fa-tag" title="名前"></i></label>
                     <input type="text" name="name" id="name" placeholder="名前" style="border-bottom: 1px solid var(--accent-color);" value="<?php if (!empty($edit_data['name'])) { echo $edit_data['name']; } ?>">
-                </li>           
-                <li>
-                    <label for="notion" title="通知"><i class="fa-solid fa-bell"></i></label>
-                    <div class="radio">
-                        <label><input type="radio" name="radio" value="1">ON</label>
-                        <label><input type="radio" name="radio" value="0" checked>OFF</label>
-                    </div>
                 </li>
                 <textarea name="comment" rows="3" placeholder="メモ"><?php if (!empty($edit_data['comment'])) { echo $edit_data['comment']; } else { echo ""; } ?></textarea>
             </ul>

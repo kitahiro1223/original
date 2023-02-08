@@ -3,6 +3,12 @@
 <div class="contents content-center">
 <div class="container">
 <main class="home-main">
+    <div class="top">
+        <div class="logo">
+            <img src="/img/icon/logo_brown.png" alt="logo">
+        </div>
+        <h2>家計簿アプリ</h2>
+    </div>
     <div class="home-box-area">
         <div class="row home-box-row">
             @if($user_role == 0)

@@ -2,7 +2,14 @@
 @section('content')
 <div class="contents">
 <div class="container">
-<div class="content-center">
+<main>
+    <div class="by-category-title" style="margin: 0 10%;">
+        <div class="back">
+            <a href="setting">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </div>
+    </div>
     <div class="form-area">
         <h2>アカウント</h2>
         <form action="" method="post">
@@ -24,5 +31,5 @@
             </div>
         </form>
     </div><!-- form-area -->
-</div><!-- content-center -->
+</main><!-- content-center -->
 @endsection

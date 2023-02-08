@@ -3,7 +3,9 @@
 <div class="contents">
 <div class="container">
 <main class="data-individual">
-    <div class="form-area login-form">
+    <div class="by-category-title" style="margin:0 10%;">
+    </div>        
+    <div class="form-area login-form" style="margin: 0 auto;">
         <h2>追加の確認</h2>
         <form action="" method="post">
             @csrf

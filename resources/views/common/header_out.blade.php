@@ -1,7 +1,7 @@
 <header>
     <a class="h-logo" href="login">
         <div class="logo"><img src="/img/icon/logo_brown.png" alt="logo"></div>
-        <h2 class="title">お知らせ家計簿</h2>
+        <h2 class="title">家計簿アプリ</h2>
     </a>
     <div class="header-items">
         <nav>
@@ -24,7 +24,6 @@
                 </li>
             </ul>
         </nav>
-        <?= links() ?>
     </div>
 </header>
 

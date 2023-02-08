@@ -36,8 +36,8 @@ Route::get("/", [App\Http\Controllers\HomeController::class, 'index']);
 Route::get("user-list", [BooksController::class, 'user_list']);
 
 // 所持金
-Route::get("possession",    [PossessionsController::class, 'possession'   ]);
-
+Route::get ("possession",    [PossessionsController::class, 'possession'   ]);
+Route::post("possession",    [PossessionsController::class, 'possession'   ]);
 Route::get ("po-category",   [PossessionsController::class, 'po_category'  ]);
 Route::post("po-category",   [PossessionsController::class, 'po_category'  ]);
 // Route::get("po-detail",     [BooksController::class, 'po_detail'    ]);
@@ -52,6 +52,7 @@ Route::post("po-delete",        [PossessionsController::class, 'po_delete']);
 
 // 収入
 Route::get ("income",           [IncomesController::class, 'income']);
+Route::post("income",           [IncomesController::class, 'income']);
 Route::get ("in-category",      [IncomesController::class, 'in_category']);
 Route::post("in-category",      [IncomesController::class, 'in_category']);
 Route::get ("in-add",           [IncomesController::class, 'in_add']);
@@ -74,7 +75,8 @@ Route::post("in-edit-comp",     [IncomesController::class, 'in_edit_comp']);
 Route::post("in-delete",        [IncomesController::class, 'in_delete']);
 
 // 支出
-Route::get("expenditure",       [ExpendituresController::class, 'expenditure']);
+Route::get ("expenditure",       [ExpendituresController::class, 'expenditure']);
+Route::post("expenditure",       [ExpendituresController::class, 'expenditure']);
 Route::get ("ex-sub-category",  [ExpendituresController::class, 'ex_sub_category']);
 Route::post("ex-sub-category",  [ExpendituresController::class, 'ex_sub_category']);
 Route::get ("ex-by-category",   [ExpendituresController::class, 'ex_by_category']);
@@ -98,13 +100,19 @@ Route::post("ex-edit-comp",     [ExpendituresController::class, 'ex_edit_comp'])
 
 Route::post("ex-delete",        [ExpendituresController::class, 'ex_delete']);
 
+Route::get ("ex-sub-error",     [ExpendituresController::class, 'ex_sub_error']);
+Route::post("ex-sub-error",     [ExpendituresController::class, 'ex_sub_error']);
+
 // 設定
 Route::get("setting", [BooksController::class, 'setting']);
 Route::get("account", [BooksController::class, 'account']);
 
-Route::get("category-kinds",   [BooksController::class, 'category_kinds' ]);
+Route::get ("category-kinds",   [BooksController::class, 'category_kinds' ]);
+Route::post("category-kinds",   [BooksController::class, 'category_kinds' ]);
 Route::get ("categories",      [BooksController::class, 'categories' ]);
 Route::post("categories",      [BooksController::class, 'categories' ]);
+Route::get ("sub-categories",  [BooksController::class, 'sub_categories' ]);
+Route::post("sub-categories",  [BooksController::class, 'sub_categories' ]);
 Route::get ("category-add",    [BooksController::class, 'category_add' ]);
 Route::post("category-add",    [BooksController::class, 'category_add' ]);
 

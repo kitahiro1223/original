@@ -3,7 +3,7 @@
 @section('content')
 <div class="hp-title">
     <div class="logo"><img src="/img/icon/logo_brown.png" alt="logo"></div>
-    <h2 class="title">お知らせ家計簿</h2>
+    <h2 class="title">家計簿アプリ</h2>
 </div>
 <div class="form-area login-form">
     <h2>{{ __('ログイン') }}</h2>

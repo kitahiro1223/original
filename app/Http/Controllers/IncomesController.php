@@ -20,112 +20,98 @@ class IncomesController extends Controller
         $request->session()->forget([
             'main_category',
             'sub_category',
+            'main_cates',
+            'sub_cates',
             'sub_cate',
             'main',
+            
             'ex_sources',
-            'in_to',
             'in_tos',
+            
+            'po_cates',
+            'in_cates',
+            'ex_cates',
+            
+            'data',
+            'kind',
             'add_data',
             'add_main_categories',
             'add_sub_categories',
             'edit_data',
-            'error'
+            'error',
+            
+            'add_cate'
+            // 'po_by_cates',
+            // 'in_to',
+            // 'to_sub',
+            // 'cate_results'
         ]);
-        
-        // 既定カテゴリ
-        // ユーザーの且つ既定mainの収入カテゴリと各合計の取得（$common_all_data）
-        $common_all_data = Income::query()
-            ->select("main_category_id")
-            ->selectRaw('SUM(amount) AS main_category_sum')
+        // カテゴリ
+            // 既定&ユーザー設定カテゴリーを取得（$common_category_obs）
+            $common_category_obs = Main_category::query()
+                ->select("id", "name", "icon_id")
+                ->where("kind_id", "=", 2)
+                ->where("del_flg", "=", 0)
+                ->where(function($query) use ($user_id) {
+                    $query
+                        ->where("user_id", "=", 0)
+                        ->orwhere("user_id", "=", $user_id);})
+                ->get();
+
+            foreach ($common_category_obs as $common_category_ob) {
+                $in_cate['id']   = $common_category_ob['id'];
+                $in_cate['name'] = $common_category_ob['name'];
+                $in_cate['icon_id'] = $common_category_ob['icon_id'];
+                $in_cate['icon'] = $common_category_ob->icon->code;
+                $in_cates[] = $in_cate;
+            } 
+            $request->session()->put("in_cates", $in_cates);
+        // end カテゴリ
+        // 収入の計算
+        // 収入のカテゴリーごとの合計
+            // ユーザーの収入取得
+            $income_obs = Income::query()
+            ->select('main_category_id')
+            ->selectRaw('SUM(amount) AS sum ')
             ->where("user_id", "=", $user_id)
-            ->where("main_category_id", "<=", 6)
             ->where("del_flg", "=", 0)
-            ->groupby("main_category_id")
-            ->get();
-        
-        // 既定カテゴリごとの合計値を$common_sum へ
-        foreach ($common_all_data as $common_data) {
-            if($common_data['main_category_id'] == 4) {
-                $common_sum['salary'] = $common_data['main_category_sum'];
-            }
-            if($common_data['main_category_id'] == 5) {
-                $common_sum['side_job'] = $common_data['main_category_sum'];
-            }
-            if($common_data['main_category_id'] == 6) {
-                $common_sum['extra'] = $common_data['main_category_sum'];
-            }
-        }
-        // 値がなければ 0 を代入
-        if(empty($common_sum['salary'])) {$common_sum['salary'] = 0;}
-        if(empty($common_sum['side_job'])) {$common_sum['side_job'] = 0;}
-        if(empty($common_sum['extra'])) {$common_sum['extra'] = 0;}
-
-        // 既定カテゴリの総計を計算
-        $common_sum['sum'] = array_sum($common_sum);
-        
-        // 追加カテゴリ
-        // ユーザーが追加したカテゴリと各合計の取得（$incomes）
-        $incomes = income::query()
-            ->select("main_category_id", "icon_id")
-            ->selectRaw('SUM(amount) AS sub_category_sum')
-            ->where("user_id", "=", $user_id)
-            ->where("main_category_id", ">", 6)
-            ->where("del_flg", "=", 0)
-            ->groupby("main_category_id", "icon_id")
+            ->groupBy("main_category_id")
             ->get();
 
-        // 追加カテゴリごとの合計（$amounts[]）
-        foreach ($incomes as $income) {
-            $amounts[] = $income->sub_category_sum;
-        }
-        if(empty($amounts)) {
-            // 追加カテゴリの値がなければ 0 を代入
-            $amounts = 0;
-            $sum = $common_sum['sum'] + $amounts;
-        } else {
-            // 追加カテゴリの値があれば合計（$sub_sum）
-            $sub_sum = array_sum($amounts);
-            // 既定カテゴリと足す（$sum）
-            $sum = $common_sum['sum'] + $sub_sum;
-        }
-        
-        // 収入(kind_id = 2)の全main_categoryを得てsessionに入れる
-        $all_in_main_category = Main_category::query()
-            ->where(function($query) {
-                $query->where("kind_id", "=", 2);})
-            ->where(function($query) use ($user_id) {
-                $query
-                    ->where("user_id", "=", 0)
-                    ->orwhere("user_id", "=", $user_id);})
-            ->select('id', 'name')
-            ->get();
-    
-            foreach ($all_in_main_category as $in_main_category) {
-                $add_main_category['id']    = $in_main_category->id;
-                $add_main_category['name']  = $in_main_category->name;
-                $add_main_categories[] = $add_main_category;
+            if(!empty($income_obs)) {
+                foreach ($income_obs as $income_ob) {
+                    $income['id'] = $income_ob->main_category_id;
+                    $income['sum'] = $income_ob->sum;
+                    $incomes[] = $income;
+                }
+            } else {
+                $incomes = array(
+                    ["id" => "1", "sum" => "0"],
+                    ["id" => "2", "sum" => "0"],
+                    ["id" => "3", "sum" => "0"]
+                );
             }
-            $request->session()->put("add_main_categories", $add_main_categories);
-
-        // [収入先](kind_id = 1)の選択肢を得てsessionに入れる
-        $all_po_category = Main_category::query()
-            ->where(function($query) {
-                $query->where("kind_id", "=", 1);})
-            ->where(function($query) use ($user_id) {
-                $query
-                    ->where("user_id", "=", 0)
-                    ->orwhere("user_id", "=", $user_id);})
-            ->select('id', 'name')
-            ->get();
-
-            foreach ($all_po_category as $po_category) {
-                $in_to['id']    = $po_category->id;
-                $in_to['name']  = $po_category->name;
-                $in_tos[] = $in_to;
+            if(!empty($incomes)) {
+                foreach ($in_cates as $in_cate) {
+                    foreach ($incomes as $income) {
+                        if($in_cate['id'] == $income['id']){
+                            $in_cate['sum'] = $income['sum'];
+                            $in_by_cates[] = $in_cate;
+                        }
+                    }
+                    if(empty($in_cate['sum'])){
+                        $in_cate['sum'] = 0;
+                        $in_by_cates[] = $in_cate;
+                    }
+                }
+            }else{
+                $incomes_sum = 0;
+                return view("income.income", compact('incomes_sum'));         
             }
-            $request->session()->put("in_tos", $in_tos);           
+        // 所持金総額
+            $incomes_sum = array_sum(array_column($incomes, 'sum'));
 
-        return view("income.income", compact('sum', 'incomes', 'common_sum')); 
+        return view("income.income", compact('incomes_sum', 'in_by_cates')); 
     }
 
     public function in_category(Request $request) { 
@@ -141,15 +127,37 @@ class IncomesController extends Controller
             $request->session()->put("main_category", $main_category);
             return redirect('in-category', 302, [], true); 
         }
-        $main_cate = $request->session()->get("main_category");
-        $main['title'] = $main_cate['name'];
-        $main['icon'] = $main_cate['icon'];
-        $request->session()->put("main", $main);
+
+        // アクセス制御
+        $referer = url()->previous();
+        // echo "<pre>"; print_r($referer); echo "</pre>"; exit;
+        $referer_check = 
+            preg_match('/income/',$referer) +
+            preg_match('/in-category/',$referer) +
+            preg_match('/in-detail/',$referer) +
+            preg_match('/in-edit/',$referer) +
+            preg_match('/in-add/',$referer)
+        ;
+        if($referer_check === 0) {
+            return redirect('income');
+        }
+
+        // 選択されたカテゴリーを取得
+            $main_cate = $request->session()->get("main_category");
+            if(empty($main_cate)) {
+                return redirect('income');
+            }
+            $main['title'] = $main_cate['name'];
+            $main['icon'] = $main_cate['icon'];
+            $request->session()->put("main", $main);
 
         // 追加、編集画面から戻ってきた場合、入力内容削除
-        $request->session()->forget('add_data');
-        $request->session()->forget('edit_data');
-        $request->session()->forget('error');
+            $request->session()->forget('data');
+            $request->session()->forget('add_data');
+            $request->session()->forget('edit_data');
+            $request->session()->forget('add_main_categories');
+            $request->session()->forget('ex_sources');
+            $request->session()->forget('error');
 
         // ユーザーの且つmain_cateのデータ取得
         $all_data = Income::query()
@@ -164,16 +172,16 @@ class IncomesController extends Controller
             $by_cate['date']     = $data->date;
             $by_cate['amount']   = $data->amount;
             $by_cates[] = $by_cate;
-
-            $amounts[] = $data->amount;
         }
-        if(empty($amounts)) { $amounts[] = 0; }
-        if(empty($by_cates)) { 
-            return view("income.in_category", compact('amounts', 'main')); 
+        if(!empty($by_cates)) { 
+            $in_by_cate_sum = array_sum(array_column($by_cates,'amount'));        
+        }else{
+            $in_by_cate_sum = 0;
+            return view("income.in_category", compact('main','in_by_cate_sum')); 
             exit;
         }
 
-        return view("income.in_category", compact('amounts', 'main', 'by_cates'));             
+        return view("income.in_category", compact('main','by_cates','in_by_cate_sum'));             
     }
 
     public function in_add(Request $request) {
@@ -183,15 +191,64 @@ class IncomesController extends Controller
         if (!isset($user_id)){ return redirect('login'); exit;}
 
         // 最初に読み込まれた時
+            // アクセス制御
+                $referer = url()->previous();
+                // echo "<pre>"; print_r($referer); echo "</pre>"; exit;
+                $referer_check = 
+                    preg_match('/in-category/',$referer) +
+                    preg_match('/in-add/',$referer) +
+                    preg_match('/in-add-confirm/',$referer)
+                ;
+                if($referer_check === 0) {
+                    return redirect('income');
+                }
             // 前ページから[カテゴリー]情報を受け取る
-            $add_data['main_category_id']   = $request->session()->get("main_category.id");
-            $add_data['main_category_name'] = $request->session()->get("main_category.name");
+                $add_data['main_category_id']   = $request->session()->get("main_category.id");
+                $add_data['main_category_name'] = $request->session()->get("main_category.name");
+                $add_data['icon']  = $request->session()->get("main.icon");
+                if(empty($add_data['main_category_id'])) {return redirect('income');}
+                if(empty($add_data['main_category_name'])) {return redirect('income');}
+                if(empty($add_data['icon'])) {return redirect('income');}
 
-            $add_data['icon']  = $request->session()->get("main.icon");
+            // 収入(kind_id = 2)の全main_categoryを得てsessionに入れる
+                $all_in_main_category = Main_category::query()
+                ->where(function($query) {
+                    $query
+                    ->where("del_flg", "=", 0)
+                    ->where("kind_id", "=", 2);})
+                ->where(function($query) use ($user_id) {
+                    $query
+                        ->where("user_id", "=", 0)
+                        ->orwhere("user_id", "=", $user_id);})
+                ->select('id', 'name')
+                ->get();
 
-            $add_main_categories = $request->session()->get("add_main_categories");
+                foreach ($all_in_main_category as $in_main_category) {
+                    $add_main_category['id']    = $in_main_category->id;
+                    $add_main_category['name']  = $in_main_category->name;
+                    $add_main_categories[] = $add_main_category;
+                }
+                $request->session()->put("add_main_categories", $add_main_categories);
                     
-            $in_tos = $request->session()->get("in_tos");
+            // [収入先](kind_id = 1)の選択肢を得てsessionに入れる
+                $all_po_category = Main_category::query()
+                ->where(function($query) {
+                    $query
+                    ->where("del_flg", "=", 0)
+                    ->where("kind_id", "=", 1);})
+                ->where(function($query) use ($user_id) {
+                    $query
+                        ->where("user_id", "=", 0)
+                        ->orwhere("user_id", "=", $user_id);})
+                ->select('id', 'name')
+                ->get();
+
+                foreach ($all_po_category as $po_category) {
+                    $in_to['id']    = $po_category->id;
+                    $in_to['name']  = $po_category->name;
+                    $in_tos[] = $in_to;
+                }
+                $request->session()->put("in_tos", $in_tos);  
         // end 最初に読み込まれた時
 
         // 入力後「追加」をクリックしたとき
@@ -203,7 +260,7 @@ class IncomesController extends Controller
                 // 入力値をバリデーション
                 $add_data['comment']    = My_function::xss($add_data['comment']);
 
-                // エラーの確認
+            // エラーの確認
                 $error = NULL;
                 // エラーがあればエラーをsessionに入れる
                 // エラーがなければ正常値をsessionに入れる
@@ -264,10 +321,24 @@ class IncomesController extends Controller
     public function in_add_confirm(Request $request) {
         // ユーザーidがなければログイン画面へ
         $user_id = $request->session()->get('user_id');
-        if (!isset($user_id)){ return redirect('login'); exit;}        
+        if (!isset($user_id)){ return redirect('login'); exit;} 
+        
+        // アクセス制御
+            $referer = url()->previous();
+            // echo "<pre>"; print_r($referer); echo "</pre>"; exit;
+            $referer_check = 
+                preg_match('/in-add/',$referer) +
+                preg_match('/in-add-confirm/',$referer)
+            ;
+            if($referer_check === 0) {
+                return redirect('income');
+            }
 
         // 前ページから情報を受け取る        
         $add_data = $request->session()->get("add_data");
+        if(empty($add_data)) {return redirect('income');}
+        $add_data['comment'] = html_entity_decode($add_data['comment']);
+        $request->session()->put("add_data", $add_data);
 
         return view("income.in_add_confirm", compact('add_data'));
     }
@@ -275,20 +346,33 @@ class IncomesController extends Controller
     public function in_add_comp(Request $request) {
         // ユーザーidがなければログイン画面へ
         $user_id = $request->session()->get('user_id');
-        if (!isset($user_id)){ return redirect('login'); exit;
-        }
+        if (!isset($user_id)){ return redirect('login'); exit;}
+
+        // アクセス制御
+            $referer = url()->previous();
+            // echo "<pre>"; print_r($referer); echo "</pre>"; exit;
+            $referer_check = 
+                preg_match('/in-add-confirm/',$referer)+
+                preg_match('/in-add-comp/',$referer)
+            ;
+            if($referer_check === 0) {
+                return redirect('income');
+            }
+
         // POST から リダイレクト
         if(!empty($request->get("add_submit"))){            
             return redirect('in-add-comp', 302, [], true); 
-        }        
+        }
 
         // データの受け取り
         $add_data = $request->session()->get("add_data");
-
+        if(empty($add_data)) {return redirect('income');}
         // 送られているのは「name」なのでDBに登録できるように
         // id と name の照合
         $add_main_categories    = $request->session()->get("add_main_categories");
         $in_tos                 = $request->session()->get("in_tos");
+        if(empty($add_main_categories)) {return redirect('income');}
+        if(empty($in_tos)) {return redirect('income');}
 
         foreach ($add_main_categories as $add_main_category) {
             if($add_main_category['name'] == $add_data['main_category']) {
@@ -319,13 +403,24 @@ class IncomesController extends Controller
         $user_id = $request->session()->get('user_id');
         if (!isset($user_id)){ return redirect('login'); exit;}
 
+        // アクセス制御
+            $referer = url()->previous();
+            // echo "<pre>"; print_r($referer); echo "</pre>"; exit;
+            $referer_check = 
+                preg_match('/po-category/',$referer) +
+                preg_match('/in-category/',$referer) +
+                preg_match('/in-detail/',$referer)
+            ;
+            if($referer_check === 0) {return redirect('income');}
+
         if(!empty($request->get("id"))){
             $data['id'] = $request->get("id");
-            $request->session()->put("data.id", $data['id']);
+            $data['kind_id'] = $request->get("kind_id");
+            $request->session()->put("data", $data);
             return redirect('in-detail'); exit;
         }        
 
-        $data['id'] = $request->session()->get("data.id");
+        $data = $request->session()->get("data");
         if(empty($data['id'])){ return redirect('income'); exit; }
         
         $data_obs = Income::query()
@@ -352,8 +447,12 @@ class IncomesController extends Controller
             if($main_cate_ob['id'] == $data_one['in_to']){
                 $data_one['in_to'] = $main_cate_ob['name'];
         }}
+
+        if(empty($data_one)){
+            return redirect('income'); exit;
+        }        
         
-        return view("income.in_detail", compact('data_one'));
+        return view("income.in_detail", compact('data','data_one'));
     }
 
     public function in_edit(Request $request) {
@@ -361,10 +460,23 @@ class IncomesController extends Controller
         $user_id = $request->session()->get('user_id');
         if (!isset($user_id)){ return redirect('login'); exit;}
 
+        // アクセス制御
+            $referer = url()->previous();
+            // echo "<pre>"; print_r($referer); echo "</pre>"; exit;
+            $referer_check = 
+                preg_match('/po-category/',$referer) +
+                preg_match('/in-category/',$referer) +
+                preg_match('/in-detail/',$referer) +
+                preg_match('/in-edit/',$referer) +
+                preg_match('/in-edit-confirm/',$referer)
+            ;
+            if($referer_check === 0) {return redirect('income');}
+
         // POSTされたデータのidをsessionへ
         if(!empty($request->get("id"))){
             $data['id'] = $request->get("id");
-            $request->session()->put("data.id", $data['id']);
+            $data['kind_id'] = $request->get("kind_id");
+            $request->session()->put("data", $data);
             return redirect('in-edit'); exit;
         }        
 
@@ -372,10 +484,10 @@ class IncomesController extends Controller
             if(!empty($request->get("edit_submit"))) {
                 // POSTを受け取る
                 $edit_data = $request->all();                
-                // $request->session()->put("edit_data", $edit_data);
+                $request->session()->put("edit_data", $edit_data);
                 
                 // データのidを受け取る
-                $data['id'] = $request->session()->get("data.id");
+                $data = $request->session()->get("data");
 
                 // コメントをバリデーション
                 $edit_data['comment']    = My_function::xss($edit_data['comment']);
@@ -384,38 +496,38 @@ class IncomesController extends Controller
                 $error = NULL;
                 // エラーがあればエラーをsessionに入れる
                 // エラーがなければ正常値をsessionに入れる
-                if($edit_data['amount'] == '') {
-                    $error['amount'] = '金額を入力して下さい';
-                    $request->session()->put("error.amount", $error['amount']);
-                    $request->session()->forget('edit_data.amount');
-                } else {
-                    $request->session()->put("edit_data.amount", $edit_data['amount']);
-                    $request->session()->forget('error.amount');
-                }
-                if($edit_data['in_to'] == "") {
-                    $error['in_to'] = '収入先を選択して下さい';
-                    $request->session()->put("error.in_to", $error['in_to']);
-                    $request->session()->forget('edit_data.in_to');
-                } else {
+                    if($edit_data['amount'] == '') {
+                        $error['amount'] = '金額を入力して下さい';
+                        $request->session()->put("error.amount", $error['amount']);
+                        $request->session()->forget('edit_data.amount');
+                    } else {
+                        $request->session()->put("edit_data.amount", $edit_data['amount']);
+                        $request->session()->forget('error.amount');
+                    }
+                    if($edit_data['in_to'] == "") {
+                        $error['in_to'] = '収入先を選択して下さい';
+                        $request->session()->put("error.in_to", $error['in_to']);
+                        $request->session()->forget('edit_data.in_to');
+                    } else {
+                        $request->session()->put("edit_data.in_to", $edit_data['in_to']);
+                        $request->session()->forget('error.in_to');
+                    }
+                    if (!empty($edit_data['main_category'])) {
+                        $request->session()->put("edit_data.main_category", $edit_data['main_category']);
+                    }
+                    if (mb_strlen($edit_data['comment']) > 100) {
+                        $error['comment'] = 'メモは100文字以内で入力して下さい。';
+                        $request->session()->put("error.comment", $error['comment']);
+                        $request->session()->forget('edit_data.comment');
+                    } else {
+                        $request->session()->put("edit_data.comment", $edit_data['comment']);
+                        $request->session()->forget('error.comment');
+                    }
+                    // 
+                    $request->session()->put("edit_data.id", $data['id']);
+                    $request->session()->put("edit_data.date", $edit_data['date']);
                     $request->session()->put("edit_data.in_to", $edit_data['in_to']);
-                    $request->session()->forget('error.in_to');
-                }
-                if (!empty($edit_data['main_category'])) {
-                    $request->session()->put("edit_data.main_category", $edit_data['main_category']);
-                }
-                if (mb_strlen($edit_data['comment']) > 100) {
-                    $error['comment'] = 'メモは100文字以内で入力して下さい。';
-                    $request->session()->put("error.comment", $error['comment']);
-                    $request->session()->forget('edit_data.comment');
-                } else {
                     $request->session()->put("edit_data.comment", $edit_data['comment']);
-                    $request->session()->forget('error.comment');
-                }
-                // 
-                $request->session()->put("edit_data.id", $data['id']);
-                $request->session()->put("edit_data.date", $edit_data['date']);
-                $request->session()->put("edit_data.in_to", $edit_data['in_to']);
-                $request->session()->put("edit_data.comment", $edit_data['comment']);
 
                 // エラーがない場合確認画面へ
                 if (!isset($error)) {
@@ -430,15 +542,15 @@ class IncomesController extends Controller
         // end 入力後「確認」をクリックしたとき
 
         // データのidを受け取る
-        $data['id'] = $request->session()->get("data.id");
+        $data = $request->session()->get("data");
         if(empty($data['id'])){ return redirect('income'); exit; }
-        // データを受け取る
-        $edit_data = $request->session()->get("edit_data");
 
         // id から情報を取得
             $data_obs = Income::query()
                 ->where("id", "=", $data['id'])
                 ->get();
+
+            if(empty($data_obs)) {return redirect('income');}
 
             foreach ($data_obs as $data_ob) {
                 $edit_data['id'] = $data_ob['id'];
@@ -451,10 +563,11 @@ class IncomesController extends Controller
                 $edit_data['amount']             = $data_ob['amount'];
                 $edit_data['comment']            = $data_ob['comment'];
             }
-
-            // 収入先とラジオの値を変換
+        // 収入先の値を変換
             $main_cates_ob = Main_category::query()
                 ->select('id', 'name')
+                ->where("user_id", "=", $user_id)
+                ->where("del_flg", "=", 0)
                 ->where("id", "=", $edit_data['in_to'])
                 ->get();
             
@@ -462,27 +575,75 @@ class IncomesController extends Controller
                 if($main_cate_ob['id'] == $edit_data['in_to']){
                     $edit_data['in_to'] = $main_cate_ob['name'];
             }}
-
+            // セッションに入れる
             $request->session()->put("edit_data", $edit_data);
 
         // [メインカテゴリー]の選択肢を得る
-        $add_main_categories = $request->session()->get("add_main_categories");
+            $all_in_main_category = Main_category::query()
+            ->where(function($query) {
+                $query
+                    ->where("del_flg", "=", 0)
+                    ->where("kind_id", "=", 2);})
+            ->where(function($query) use ($user_id) {
+                $query
+                    ->where("user_id", "=", 0)
+                    ->orwhere("user_id", "=", $user_id);})
+            ->select('id', 'name')
+            ->get();
+    
+            foreach ($all_in_main_category as $in_main_category) {
+                $add_main_category['id']    = $in_main_category->id;
+                $add_main_category['name']  = $in_main_category->name;
+                $add_main_categories[] = $add_main_category;
+            }
+            $request->session()->put("add_main_categories", $add_main_categories);
 
-        $in_tos = $request->session()->get("in_tos");
+        // [収入先](kind_id = 1)の選択肢を得てsessionに入れる
+            $all_po_category = Main_category::query()
+            ->where(function($query) {
+                $query
+                    ->where("del_flg", "=", 0)
+                    ->where("kind_id", "=", 1);})
+            ->where(function($query) use ($user_id) {
+                $query
+                    ->where("user_id", "=", 0)
+                    ->orwhere("user_id", "=", $user_id);})
+            ->select('id', 'name')
+            ->get();
+
+            foreach ($all_po_category as $po_category) {
+                $in_to['id']    = $po_category->id;
+                $in_to['name']  = $po_category->name;
+                $in_tos[] = $in_to;
+            }
+            $request->session()->put("in_tos", $in_tos);  
 
         $error = $request->session()->get("error");
         
-        return view("income.in_edit", compact('edit_data', 'add_main_categories', 'in_tos', 'error'));
+        return view("income.in_edit", compact('data','edit_data', 'add_main_categories', 'in_tos', 'error'));
     }
 
     public function in_edit_confirm(Request $request) {
         // ユーザーidがなければログイン画面へ
         $user_id = $request->session()->get('user_id');
         if (!isset($user_id)){ return redirect('login'); exit;}
+        
+        // アクセス制御
+            $referer = url()->previous();
+            // echo "<pre>"; print_r($referer); echo "</pre>"; exit;
+            $referer_check = 
+                preg_match('/in-edit/',$referer) +
+                preg_match('/in-edit-confirm/',$referer)
+            ;
+            if($referer_check === 0) {return redirect('income');}
 
         // 前ページから情報を受け取る        
             $edit_data = $request->session()->get("edit_data");
+            if(empty($edit_data)) {return redirect('income');}
+            $edit_data['comment'] = html_entity_decode($edit_data['comment']);
+            $request->session()->put("edit_data", $edit_data);            
 
+        // echo "<pre>"; print_r($edit_data); echo "</pre>"; exit;
         return view("income.in_edit_confirm", compact('edit_data'));
     }
 
@@ -491,15 +652,30 @@ class IncomesController extends Controller
         $user_id = $request->session()->get('user_id');
         if (!isset($user_id)){ return redirect('login'); exit;}
 
-        if(!empty($request->get("edit_submit"))){            
-            return redirect('in-edit-comp', 302, [], true);}
+        // アクセス制御
+            $referer = url()->previous();
+            // echo "<pre>"; print_r($referer); echo "</pre>"; exit;
+            $referer_check = 
+            preg_match('/in-edit-confirm/',$referer)+
+            preg_match('/in-edit-comp/',$referer)
+            ;
+            if($referer_check === 0) {return redirect('income');}        
 
+        // POST から リダイレクト
+        if(!empty($request->get("edit_submit"))){            
+            return redirect('in-edit-comp', 302, [], true);
+        }
+       
+        // データの受け取り
         $edit_data = $request->session()->get("edit_data");
+        if(empty($edit_data)) {return redirect('income');}
 
         // 送られているのは「name」なのでDBに登録できるように
         // id と name の照合
         $edit_main_categories   = $request->session()->get("add_main_categories");
-        $in_tos             = $request->session()->get("in_tos");
+        $in_tos                 = $request->session()->get("in_tos");
+        if(empty($edit_main_categories)) {return redirect('income');}
+        if(empty($in_tos)) {return redirect('income');}
 
         foreach ($edit_main_categories as $edit_main_category) {
             if($edit_main_category['name'] == $edit_data['main_category']) {
@@ -524,7 +700,9 @@ class IncomesController extends Controller
         // データベースに保存
         $income->save();
 
-        return view("income.in_edit_comp");
+        $data = $request->session()->get("data");
+
+        return view("income.in_edit_comp", compact('data'));
     }
 
     public function in_delete(Request $request) {
@@ -543,6 +721,12 @@ class IncomesController extends Controller
         // データベースに保存
         $income->save();
 
+        if(!empty($request->get('kind_id'))){
+            $kind_id = $request->get('kind_id');
+            if($kind_id == 1){
+                return redirect('po-category');
+            }
+        }
         return redirect('in-category');
     }
 

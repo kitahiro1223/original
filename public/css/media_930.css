@@ -56,6 +56,7 @@
         background-color: var(--header-bg-color);
         box-shadow: -10px 0px 10px rgba(0, 0, 0, 0.4);
         color: var(--text-color);
+        z-index: 1;
     }
     .bottom-menu ul {
         height: 100%;
@@ -140,8 +141,6 @@
         position: relative;
         top: -12px;
     }
-
-
 
 
 

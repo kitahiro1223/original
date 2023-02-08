@@ -46,7 +46,9 @@ class BooksController extends Controller
             $users[] = $user;
         }
 
-        return view('user_list', compact('user_id', 'page_top', 'users'));
+        $user_role = $request->session()->get('user_role');
+
+        return view('user_list', compact('user_id','user_role','page_top','users'));
     }
 
     // 設定
@@ -61,16 +63,28 @@ class BooksController extends Controller
             'main_cates',
             'sub_cates',
             'sub_cate',
-            'to_sub',
             'main',
+            
             'ex_sources',
-            'in_to',
             'in_tos',
+            
+            'po_cates',
+            'in_cates',
+            'ex_cates',
+            
+            'data',
+            'kind',
             'add_data',
             'add_main_categories',
             'add_sub_categories',
-            'kind',
-            'error'
+            'edit_data',
+            'error',
+            
+            'add_cate'
+            // 'po_by_cates',
+            // 'in_to',
+            // 'to_sub',
+            // 'cate_results'
         ]);
         
         return view("setting.setting"); 
@@ -100,23 +114,30 @@ class BooksController extends Controller
         $request->session()->forget([
             'main_category',
             'sub_category',
-            'main_cates',
-            'sub_cates',
+            // 'main_cates',
+            // 'sub_cates',
             'sub_cate',
-            'to_sub',
             'main',
+            
             'ex_sources',
-            'in_to',
             'in_tos',
+            
+            'po_cates',
+            'in_cates',
+            'ex_cates',
+            
+            'data',
+            'kind',
             'add_data',
             'add_main_categories',
             'add_sub_categories',
             'edit_data',
-            'po_cates',
-            'po_by_cates',
-            'cate_results',
-            'kind',
-            'error'
+            'error',
+            
+            // 'po_by_cates',
+            // 'in_to',
+            // 'to_sub',
+            // 'cate_results'
         ]);
 
         return view("setting.category_kinds");         
@@ -127,42 +148,47 @@ class BooksController extends Controller
         $user_id = $request->session()->get('user_id');
         if (!isset($user_id)){ return redirect('login'); exit;}
 
-        echo url()->previous(); exit;
-
-        $request->session()->forget("add_cate");
-        $request->session()->forget("error");
-
-        // 機能の情報
+        // 機能のPOST情報リダイレクト
         if(!empty($request->get("kind_id"))){
             $kind['id'] = $request->get("kind_id");
             $kind['name'] = $request->get("kind_name");
             $request->session()->put("kind", $kind);
-
             return redirect('categories'); exit;
         }
 
-        // メインカテゴリーの情報
-        if(!empty($request->get("main_cate_id"))){
-            $to_sub['id'] = $request->get("main_cate_id");
-            $to_sub['name'] = $request->get("main_cate_name");
-            $request->session()->put("to_sub", $to_sub);
+        // アクセス制御
+            $referer = url()->previous();
+            // echo "<pre>"; print_r($referer); echo "</pre>"; exit;
+            $referer_check = 
+                preg_match('/category-kinds/',$referer) +
+                preg_match('/categories/',$referer) +
+                preg_match('/sub_categories/',$referer) +
+                preg_match('/category-add/',$referer)
+            ;
+            if($referer_check === 0) {return redirect('category-kinds');}
+            
+        // 機能の情報取得
+            $kind = $request->session()->get("kind");
+            if(empty($kind)) {return redirect('category-kinds');}
 
-            return redirect('categories'); exit;
-        }
-
-        $kind = $request->session()->get("kind");
-
+        // 戻ってきたらセッション削除
+            $request->session()->forget("main_cate");
+            $request->session()->forget("sub_cate");
+            $request->session()->forget("sub_cates");
+            $request->session()->forget("add_cate");
+            $request->session()->forget("error");
+            
         // kind の全カテゴリーのicon, name
-        // ユーザーの且つ既定の各機能のmainカテゴリ("id", "name")を取得
-        $main_cate_obs = Main_category::query()
-            ->select("id", "user_id", "name", "icon_id")
-            ->where("kind_id", "=", $kind['id'])
-            ->where("del_flg", "=", 0)
-            ->where(function($query) use ($user_id) {
-                $query
-                    ->where("user_id", "=", 0)
-                    ->orwhere("user_id", "=", $user_id);})
-            ->get();        
+            // ユーザーの且つ既定の各機能のmainカテゴリ("id", "name")を取得
+            $main_cate_obs = Main_category::query()
+                ->select("id", "user_id", "name", "icon_id")
+                ->where("kind_id", "=", $kind['id'])
+                ->where("del_flg", "=", 0)
+                ->where(function($query) use ($user_id) {
+                    $query
+                        ->where("user_id", "=", 0)
+                        ->orwhere("user_id", "=", $user_id);})
+                ->get();        
 
             foreach ($main_cate_obs as $main_cate_ob) {
                 $main_cate['id']   = $main_cate_ob['id'];
@@ -172,17 +198,57 @@ class BooksController extends Controller
                 $main_cate['icon'] = $main_cate_ob->icon->code;
                 $main_cates[] = $main_cate;
             } 
-            $request->session()->put("main_cates", $main_cates);
         // end カテゴリ        
+        if(!empty($main_cates)) { 
+            $request->session()->put("main_cates", $main_cates);
+        }else{
+            return view("setting.categories", compact('kind')); 
+            exit;
+        }
+        
+        return view("setting.categories", compact('kind','main_cates')); 
+    }
+    
+    public function sub_categories(Request $request) {
+        // ユーザーidがなければログイン画面へ
+        $user_id = $request->session()->get('user_id');
+        if (!isset($user_id)){ return redirect('login'); exit;}
 
-        $to_sub = $request->session()->get("to_sub");
+        // メインカテゴリーの情報、POSTリダイレクト
+        if(!empty($request->get("main_cate_id"))){
+            $main_cate['id'] = $request->get("main_cate_id");
+            $main_cate['name'] = $request->get("main_cate_name");
+            $main_cate['icon_id'] = $request->get("icon_id");
+            $main_cate['icon'] = $request->get("icon");
+            $request->session()->put("main_cate", $main_cate);   
+            return redirect('sub-categories'); exit;
+        }
 
-        if(!empty($to_sub)) {
+        // アクセス制御
+            $referer = url()->previous();
+            // echo "<pre>"; print_r($referer); echo "</pre>"; exit;
+            $referer_check = 
+                preg_match('/categories/',$referer) +
+                preg_match('/sub_categories/',$referer) +
+                preg_match('/category-add/',$referer)
+            ;
+            if($referer_check === 0) {return redirect('category-kinds');}
+
+        // 機能の情報
+            $kind = $request->session()->get("kind");
+            $main_cate = $request->session()->get("main_cate");
+            if(empty($kind)) {return redirect('category-kinds');}
+            if(empty($main_cate)) {return redirect('category-kinds');}
+
+        // 追加から戻ってきた場合、セッション削除
+            $request->session()->forget("add_cate");
+            $request->session()->forget("error");
+
             // sub の全カテゴリーのicon, name
             // ユーザーの且つ既定の各機能のmainカテゴリ("id", "name")を取得
             $sub_cate_obs = Sub_category::query()
                 ->select("id", "user_id", "name", "main_category_id AS icon_id")
-                ->where("main_category_id", "=", $to_sub['id'])
+                ->where("main_category_id", "=", $main_cate['id'])
                 ->where("del_flg", "=", 0)
                 ->where(function($query) use ($user_id) {
                     $query
@@ -194,95 +260,92 @@ class BooksController extends Controller
                     $sub_cate['id']   = $sub_cate_ob['id'];
                     $sub_cate['user_id'] = $sub_cate_ob['user_id'];
                     $sub_cate['name'] = $sub_cate_ob['name'];
-                    $sub_cate['icon_id'] = $sub_cate_ob['icon_id'];
-                    $sub_cate['icon'] = $sub_cate_ob->icon->code;
                     $sub_cates[] = $sub_cate;
                 } 
-                $request->session()->put("sub_cates", $sub_cates);
+                if(!empty($sub_cates)){
+                    $request->session()->put("sub_cates", $sub_cates);
+                }else{
+                    return view("setting.sub_categories", compact('kind','main_cate'));
+                    exit;
+                }
             // end カテゴリ
-            return view("setting.categories", compact('kind','main_cates','sub_cates','to_sub'));
-            exit; 
-        }
-        $request->session()->forget("sub_cates");
         
-        return view("setting.categories", compact('kind','main_cates','to_sub')); 
+        return view("setting.sub_categories", compact('kind','main_cate','sub_cates')); 
     }
     
     public function category_add(Request $request) {
         // ユーザーidがなければログイン画面へ
         $user_id = $request->session()->get('user_id');
         if (!isset($user_id)){ return redirect('login'); exit;}
-
-        // 
+        
+        // POST
         if(!empty($request->get("add_cate_kind"))){
             $add_cate['kind'] = $request->get("add_cate_kind");
             $add_cate['main'] = $request->get("add_cate_main");
             $request->session()->put("add_cate", $add_cate);
             return redirect('category-add'); exit;
         }
+        
         $add_cate = $request->session()->get("add_cate");
+        if(empty($add_cate)) {return redirect('category-kinds');}
 
         // 追加を押した時
-        if(!empty($request->get("add_submit"))){
-            $add_cate = $request->session()->get("add_cate");
-            $add_cate['name'] = $request->get("add_cate_name");
-
-            // 名前をバリデーション
-            $add_cate['name']    = My_function::xss($add_cate['name']);
-
-            // エラーの確認
-            $error = NULL;
-            $request->session()->forget('error');
-            // エラーがあればエラーをsessionに入れる
-            // エラーがなければ正常値をsessionに入れる
-            if($add_cate['name'] == '') {
-                $error['name'] = '名前を入力して下さい';
-                $request->session()->put("error.name", $error['name']);
-                $request->session()->forget('add_cate.name');
-            } else {
-                $request->session()->put("add_cate.name", $add_cate['name']);
-                $request->session()->forget('error.name');
-            }
-            $request->session()->put("add_cate", $add_cate);
-
-            if (!isset($error)) {
-                // エラーがない場合登録
-                $request->session()->forget('error');
-
-                $kind = $request->session()->get("kind");
-                $to_sub = $request->session()->get("to_sub");
-                $add_cate = $request->session()->get("add_cate");
+            if(!empty($request->get("add_submit"))){
+                $name = $request->get("add_cate_name");
                 
-                if(empty($add_cate['main'])){
-                    $main_category = new Main_category();
-                    // プロパティに値を代入
-                    $main_category->user_id = $user_id;
-                    $main_category->kind_id = $add_cate['kind'];
-                    $main_category->icon_id = 0;
-                    $main_category->name    = $add_cate['name'];
-                    // データベースに保存
-                    $main_category->save();
-                }
-                elseif(!empty($add_cate['main'])){
-                    $sub_category = new Sub_category();
-                    // プロパティに値を代入
-                    $sub_category->user_id           = $user_id;
-                    $sub_category->main_category_id  = $add_cate['main'];
-                    $sub_category->name              = $add_cate['name'];
-                    // データベースに保存
-                    $sub_category->save();
-                }
+                // 名前をバリデーション
+                $add_cate = $request->session()->get("add_cate");
+                $add_cate['name']    = My_function::xss($name);
 
-                $request->session()->forget("add_cate");
-                return redirect("categories");
-                exit;
-            } else {
-                // エラーがある場合
-                return redirect("category-add");
-                exit;
+                // エラーの確認
+                    $error = NULL;
+                    $request->session()->forget('error');
+                    // エラーがあればエラーをsessionに入れる
+                    // エラーがなければ正常値をsessionに入れる
+                    if($add_cate['name'] == '') {
+                        $error['name'] = '名前を入力して下さい';
+                        $request->session()->put("error.name", $error['name']);
+                        $request->session()->forget('add_cate.name');
+                    } else {
+                        $request->session()->put("add_cate.name", $add_cate['name']);
+                        $request->session()->forget('error.name');
+                    }
+
+                if (!isset($error)) {
+                    // エラーがない場合登録
+                    $request->session()->forget('error');
+
+                    $add_cate = $request->session()->get("add_cate");
+
+                    if(!empty($add_cate['main'])){
+                        $sub_category = new Sub_category();
+                        // プロパティに値を代入
+                        $sub_category->user_id           = $user_id;
+                        $sub_category->main_category_id  = $add_cate['main'];
+                        $sub_category->name              = $add_cate['name'];
+                        // データベースに保存
+                        $sub_category->save();
+
+                    }elseif(!empty($add_cate['kind'])){
+                        $main_category = new Main_category();
+                        // プロパティに値を代入
+                        $main_category->user_id = $user_id;
+                        $main_category->kind_id = $add_cate['kind'];
+                        $main_category->icon_id = 0;
+                        $main_category->name    = $add_cate['name'];
+                        // データベースに保存
+                        $main_category->save();
+                    }
+
+                    $request->session()->forget("add_cate");
+                    return redirect("categories");
+                    exit;
+                } else {
+                    // エラーがある場合
+                    return redirect("category-add");exit;
+                }
+                return redirect('categories'); exit;
             }
-            return redirect('categories'); exit;
-        }
         $error = $request->session()->get("error");
         
         return view("setting.category_add", compact('error')); 

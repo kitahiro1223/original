@@ -4,6 +4,11 @@
 <div class="container">
 <main class="by-category-main">
     <div class="by-category-title">
+        <div class="back">
+            <a href="home">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </div>
         <div class="icon-area color5""><!-- アイコンを収める -->
             <i class="{{ $page_top['icon'] }}"></i>
         </div>

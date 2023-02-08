@@ -3,6 +3,21 @@
 <div class="contents">
 <div class="container">
 <main class="data-individual">
+    <div class="by-category-title" style="margin: 0 10%;">
+        @if($data['kind_id'] == 2)
+        <div class="back">
+            <a href="in-category">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </div>                
+        @elseif($data['kind_id'] == 1)
+        <div class="back">
+            <a href="po-category">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </div>        
+        @endif        
+    </div>
     <div class="form-area login-form">
         <h2>詳細</h2>
         <form>

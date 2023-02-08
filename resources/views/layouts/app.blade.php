@@ -28,7 +28,7 @@
     <header>
         <a class="h-logo" href="{{ route('login') }}" >
             <div class="logo"><img src="/img/icon/logo_brown.png" alt="logo"></div>
-            <h2 class="title" style="">お知らせ家計簿</h2>
+            <h2 class="title" style="">家計簿アプリ</h2>
         </a>
         <div class="header-items">
             <nav>
@@ -80,7 +80,6 @@
                     @endguest
                 </ul>
             </nav>
-            <?= links() ?>
         </div>
     </header>
     <div class="bottom-menu">

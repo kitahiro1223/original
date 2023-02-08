@@ -4,6 +4,11 @@
 <div class="container">
 <main class="by-category-main">
     <div class="by-category-title">
+        <div class="back">
+            <a href="category-kinds">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </div>         
         <div class="icon-area color2">
             <i class="icon fa-solid fa-gear"></i>
         </div>
@@ -40,16 +45,13 @@
                 <h3>追加</h3>
             </div>
             <input type="hidden" name="add_cate_kind" value="{{ $kind['id'] }}">
-            @if(!empty($to_sub))
-                <input type="hidden" name="add_cate_main" value="{{ $to_sub['id'] }}">
-            @endif
             <input type="submit" name="add_cate_submit" class="main_category_btn" value="">
         </form>
     </div>
     <div class="by-category-inner">
         <ul class="data-list">
-            <!-- 所持金・収入 -->
-            @if($kind['id'] != 3 && empty($sub_cates))
+            <!-- 所持金・収入 メインカテゴリーを表示-->
+            @if($kind['id'] != 3)
                 @foreach($main_cates as $main_cate)
                 <li class="box">
                     <div class="info-area">
@@ -69,17 +71,19 @@
                     @endif
                 </li>
                 @endforeach
-            <!-- 支出（メインカテゴリー） -->
-            @elseif($kind['id'] == 3 && empty($sub_cates))
+            <!-- 支出 メインカテゴリーの表示とサブカテゴリーへのform -->
+            @else
                 @foreach($main_cates as $main_cate)
                 <li class="box box-link" style="position: relative;">
-                    <form action="categories" method="POST" class="data-btn-form">
+                    <form action="sub-categories" method="POST" class="data-btn-form">
                         @csrf
                         <div class="info-area">
                             <div class="icon-area header-icon po-kind color5">
-                                <i class="{{$main_cate['icon']}}"></i>
+                                <i class="{{ $main_cate['icon'] }}"></i>
                             </div>
                             <div class="data-name">{{$main_cate['name']}}</div>
+                            <input type="hidden" name="icon_id" value="{{ $main_cate['icon_id'] }}">
+                            <input type="hidden" name="icon" value="{{ $main_cate['icon'] }}">
                         </div>
                         <input type="hidden" name="main_cate_id" value="{{ $main_cate['id'] }}">
                         <input type="hidden" name="main_cate_name" value="{{ $main_cate['name'] }}">
@@ -96,27 +100,6 @@
                     @endif
                 </li>
                 @endforeach
-            <!-- 支出（サブカテゴリー） -->
-            @elseif(!empty($sub_cates))
-                @foreach($sub_cates as $sub_cate)
-                <li class="box">
-                    <div class="info-area">
-                        <div class="icon-area header-icon po-kind color5">
-                            <i class="{{$sub_cate['icon']}}"></i>
-                        </div>
-                        <div class="data-name">{{$sub_cate['name']}}</div>
-                    </div>
-                    @if($sub_cate['user_id'] != 0)
-                    <div class="data-btn-area">
-                        <form action="category-delete" method="POST" class="data-btn-form">
-                            @csrf
-                            <input type="hidden" name="sub_cate_id" value="{{ $sub_cate['id'] }}">
-                            <input type="submit" class="data-btn-submit trash-btn" value=""><i class="btn fa-solid fa-trash"></i></input>
-                        </form>
-                    </div>
-                    @endif
-                </li>
-                @endforeach                
             @endif
         </ul>
     </div><!-- .by-category-inner -->

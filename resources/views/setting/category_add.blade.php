@@ -2,7 +2,14 @@
 @section('content')
 <div class="contents content-center">
 <div class="container">
-<main class="data-individual content-center" style="height: auto;">
+<main class="data-individual" style="height: 400px;">
+    <div class="by-category-title" style="margin: 0 10%; height: 0;">
+        <div class="back">
+            <a href="categories">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </div>
+    </div>
     <div class="form-area login-form">
         <h2>カテゴリーの追加</h2>
         <form action="category-add" method="post">

@@ -1,9 +1,14 @@
 @extends('layouts.in')
 @section('content')
-<div class="contents content-center ">
+<div class="contents content-center">
 <div class="container">
 <main class="by-category-main">
-    <div class="by-category-title">
+    <div class="by-category-title" style="margin: 0 10%;">
+        <div class="back">
+            <a href="setting">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </div>
         <div class="icon-area color2"><!-- アイコンを収める -->
             <i class="icon fa-solid fa-gear"></i>
         </div>

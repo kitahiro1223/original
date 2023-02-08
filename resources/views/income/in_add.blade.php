@@ -2,8 +2,15 @@
 @section('content')
 <div class="contents">
 <div class="container">
-<main class="data-individual content-center" style="height: auto;">
-    <div class="form-area login-form">
+<main class="data-individual" style="height: auto;">
+    <div class="by-category-title" style="margin: 0 10%;">
+        <div class="back">
+            <a href="in-category">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </div>
+    </div>
+    <div class="form-area login-form" style="margin: 0 auto;">
         <h2>収入の追加</h2>
         <form action="in-add" method="post">
             @csrf

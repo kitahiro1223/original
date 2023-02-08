@@ -2,8 +2,23 @@
 @section('content')
 <div class="contents">
 <div class="container">
-<main class="data-individual content-center" style="height: auto;">
-    <div class="form-area login-form">
+<main class="data-individual" style="height: auto;">
+    <div class="by-category-title" style="margin: 0 10%;">
+        @if($data['kind_id'] == 2)
+        <div class="back">
+            <a href="in-category">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </div>                
+        @elseif($data['kind_id'] == 1)
+        <div class="back">
+            <a href="po-category">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </div>        
+        @endif        
+    </div>
+    <div class="form-area login-form" style="margin: 0 auto;">
         <h2>編集</h2>
         <form action="in-edit" method="post">
             @csrf
@@ -27,8 +42,8 @@
                                 <option value="{{ $edit_data['main_category_name'] }}">{{ $edit_data['main_category_name'] }}</option>
                             @endif
                             @foreach ($add_main_categories as $add_main_category)
-                                @if (!empty($edit_data['sub_category_id'])) 
-                                    @if ($edit_data['sub_category_name'] != $add_sub_category['name']) 
+                                @if (!empty($edit_data['main_category_id'])) 
+                                    @if ($edit_data['main_category_name'] != $add_main_category['name']) 
                                         <option value="{{ $add_main_category['name'] }}">{{ $add_main_category["name"] }}</option>
                                     @endif
                                 @else
@@ -46,13 +61,17 @@
                     <label for="in_to" title="収入先"><i class="fa-solid fa-wallet"></i></label>
                     <select name="in_to" id="in-to">
                         @if (!empty($edit_data['in_to']))
-                            <option value="{{ $edit_data['in_to'] }}">{{ $edit_data["in_to"] }}</option>;
+                            @foreach ($in_tos as $in_to)
+                                @if ($edit_data['in_to'] == $in_to['id'])
+                                    <option value="{{ $in_to['name'] }}">{{ $in_to["name"] }}</option>
+                                @endif
+                            @endforeach
                         @else
                             <option value="">収入先を選択</option>
                         @endif
                         @foreach ($in_tos as $in_to)
                             @if (!empty($edit_data['in_to']))
-                                @if ($edit_data['in_to'] != $in_to['name'])
+                                @if ($edit_data['in_to'] != $in_to['id'])
                                     <option value="{{ $in_to['name'] }}">{{ $in_to["name"] }}</option>
                                 @endif
                             @else

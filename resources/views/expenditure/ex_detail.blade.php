@@ -3,7 +3,22 @@
 <div class="contents">
 <div class="container">
 <main class="data-individual">
-    <div class="form-area login-form">
+    <div class="by-category-title" style="margin: 0 10%;">
+        @if($data['kind_id'] == 3)
+        <div class="back">
+            <a href="ex-by-category">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </div>                
+        @elseif($data['kind_id'] == 1)
+        <div class="back">
+            <a href="po-category">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </div>        
+        @endif
+    </div>
+    <div class="form-area login-form" style="margin: 0 auto;">
         <h2>詳細</h2>
         <form>
             @csrf
@@ -31,10 +46,6 @@
                 <li>
                     <label for="ex_source" title="支出元"><i class="fa-solid fa-wallet"></i></label>
                     <div class="data_one">{{ $data_one['ex_source'] }}</div>
-                </li>
-                <li>
-                    <label for="notion" title="通知"><i class="fa-solid fa-bell"></i></label>
-                    <div class="data_one">{{ $data_one['notice'] }}</div>
                 </li>
                 <li>
                     <label for="name"><i class="fa-solid fa-tag" title="カテゴリー"></i></label>

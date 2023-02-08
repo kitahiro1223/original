@@ -4,6 +4,11 @@
 <div class="container">
 <main class="by-category-main">
     <div class="by-category-title">
+        <div class="back">
+            <a href="possession">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+        </div>
         <div class="icon-area color5""><!-- アイコンを収める -->
             <i class="{{ $main['icon'] }}"></i>
         </div>
@@ -11,7 +16,7 @@
     </div>
     <div class="box total-box">
         <h3>総計</h3>
-        <p>{{ "¥".number_format(array_sum(array_column($results, 'amount'))) }}</p>
+        <p>{{ "¥".number_format($po_by_cate_sum) }}</p>
     </div>
     <div class="by-category-inner">
         <ul class="data-list">
@@ -20,6 +25,7 @@
                 <li class="box">
                     <div class="info-area">
                         <div class="data-date">{{ $result['date'] }}</div>
+                        <!-- アイコン、収入か支出か -->
                         @if($result['kind_id'] == 2)
                             <div class="icon-area header-icon po-kind color5">
                                 <i class="icon icon-left icon-half fa-solid fa-right-long"></i>
@@ -34,36 +40,43 @@
                         <div class="data-amount">{{ "¥".number_format($result['amount']) }}</div>
                     </div>
                     <div class="data-btn-area">
+                        <!-- 編集ボタン、収入か支出か -->
                         @if($result['kind_id'] == 2)
                             <form action="in-detail" method="POST" class="data-btn-form">
                                 @csrf
                                 <input type="hidden" name="id" value="{{ $result['id'] }}">
+                                <input type="hidden" name="kind_id" value="1">
                                 <input type="submit" class="data-btn-submit" value=""><i class="btn fa-solid fa-circle-info"></i></input>
                             </form>
                             <form action="in-edit" method="POST" class="data-btn-form">
                                 @csrf
                                 <input type="hidden" name="id" value="{{ $result['id'] }}">
+                                <input type="hidden" name="kind_id" value="1">
                                 <input type="submit" class="data-btn-submit" value=""><i class="btn fa-solid fa-pen"></i></input>
                             </form>
                             <form action="in-delete" method="POST" class="data-btn-form">
                                 @csrf
                                 <input type="hidden" name="id" value="{{ $result['id'] }}">
+                                <input type="hidden" name="kind_id" value="1">
                                 <input type="submit" class="data-btn-submit trash-btn" value=""><i class="btn fa-solid fa-trash"></i></input>
                             </form>
                         @elseif($result['kind_id'] == 3)
                             <form action="ex-detail" method="POST" class="data-btn-form">
                                 @csrf
                                 <input type="hidden" name="id" value="{{ $result['id'] }}">
+                                <input type="hidden" name="kind_id" value="1">
                                 <input type="submit" class="data-btn-submit" value=""><i class="btn fa-solid fa-circle-info"></i></input>
                             </form>
                             <form action="ex-edit" method="POST" class="data-btn-form">
                                 @csrf
                                 <input type="hidden" name="id" value="{{ $result['id'] }}">
+                                <input type="hidden" name="kind_id" value="1">
                                 <input type="submit" class="data-btn-submit" value=""><i class="btn fa-solid fa-pen"></i></input>
                             </form>
                             <form action="ex-delete" method="POST" class="data-btn-form">
                                 @csrf
                                 <input type="hidden" name="id" value="{{ $result['id'] }}">
+                                <input type="hidden" name="kind_id" value="1">
                                 <input type="submit" class="data-btn-submit trash-btn" value=""><i class="btn fa-solid fa-trash"></i></input>
                             </form>
                         @endif

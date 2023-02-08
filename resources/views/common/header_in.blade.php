@@ -1,11 +1,22 @@
 <header>
     <a class="h-logo" href="/">
         <div class="logo"><img src="/img/icon/logo_brown.png" alt="logo"></div>
-        <h2 class="title">お知らせ家計簿</h2>
+        <h2 class="title">家計簿アプリ</h2>
     </a>    
     <div class="header-items">
         <nav>
             <ul>
+                @if(empty($user_role) || $user_role != 1 )
+                @else
+                <li>
+                    <a href="possession">
+                        <div class="icon-area header-icon color3">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="h-item-name">ユーザー</div>
+                    </a>
+                </li>
+                @endif
                 <li>
                     <a href="possession">
                         <div class="icon-area header-icon color3">
@@ -42,16 +53,8 @@
                 </li>
             </ul>
         </nav>
-        <?= links() ?>
     </div>
 </header>
-
-<div class="top">
-    <div class="logo">
-        <img src="/img/icon/logo_brown.png" alt="logo">
-    </div>
-    <h2>PageTitle</h2>
-</div>
 
 <div class="bottom-menu">
     <ul>

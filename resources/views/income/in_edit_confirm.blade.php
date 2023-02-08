@@ -3,7 +3,9 @@
 <div class="contents">
 <div class="container">
 <main class="data-individual">
-    <div class="form-area login-form">
+    <div class="by-category-title" style="margin:0 10%;">
+    </div>    
+    <div class="form-area login-form" style="margin: 0 auto;">
         <h2>編集の確認</h2>
         <form action="in-edit" method="post">
             @csrf
@@ -16,9 +18,6 @@
                 <li>
                     <label for="category"><i class="fa-solid fa-folder-open" title="カテゴリー"></i></label>
                     <div class="add_category_area">
-                        <!-- <div class="icon-area color5" style="margin: 0 6px 0 0;">
-                            <i class="{{ $edit_data['icon'] }}"></i>
-                        </div> -->
                         <p class="add_data">{{ $edit_data['main_category'] }}</p>
                     </div>
                 </li>
